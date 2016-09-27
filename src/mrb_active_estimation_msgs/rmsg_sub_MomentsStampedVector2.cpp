@@ -47,7 +47,6 @@
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
-
 /*
  * Need to include simstruc.h for the definition of the SimStruct and
  * its associated macro definitions.
@@ -204,7 +203,10 @@ static void mdlInitializeSizes(SimStruct *S)
     const uint32_t n_el = mxGetScalar(ssGetSFcnParam(S, 4));
 
     ssSetOutputPortMatrixDimensions(S, 0, 1, nRobots);    // num_el
+    ssSetOutputPortDataType(S, 0,  SS_UINT32);
+
     ssSetOutputPortMatrixDimensions(S, 1, n_el, nRobots); // id
+    ssSetOutputPortDataType(S, 1,  SS_UINT32);
     ssSetOutputPortMatrixDimensions(S, 2, n_el, nRobots); // xg
     ssSetOutputPortMatrixDimensions(S, 3, n_el, nRobots); // yg
     ssSetOutputPortMatrixDimensions(S, 4, n_el, nRobots); // a
@@ -340,8 +342,8 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     const size_t n_el = ssGetIWork(S)[1];
 
     // Preparing Outputs
-    real_T *curr_num_el = (real_T*)ssGetOutputPortSignal(S,0);
-    real_T *id = (real_T*)ssGetOutputPortSignal(S,1);
+    uint32_t *curr_num_el = (uint32_t*)ssGetOutputPortSignal(S,0);
+    uint32_t *id = (uint32_t*)ssGetOutputPortSignal(S,1);
     real_T *xg = (real_T*)ssGetOutputPortSignal(S,2);
     real_T *yg = (real_T*)ssGetOutputPortSignal(S,3);
     real_T *a = (real_T*)ssGetOutputPortSignal(S,4);
@@ -369,7 +371,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
         memcpy(n20+i*n_el, lastMsg->n20.data(),std::min(n_el,lastMsg->n20.size())*sizeof(double));
 
         for (size_t k = std::min(n_el,lastMsg->id.size()); k<n_el; ++k)
-          id[i*n_el+k] = NAN;
+          id[i*n_el+k] = (uint32_t)NAN;
         for (size_t k = std::min(n_el,lastMsg->xg.size()); k<n_el; ++k)
           xg[i*n_el+k] = NAN;
         for (size_t k = std::min(n_el,lastMsg->yg.size()); k<n_el; ++k)
