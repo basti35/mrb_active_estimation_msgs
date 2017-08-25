@@ -362,7 +362,8 @@ static void mdlOutputs(SimStruct *S, int_T tid)
       if (lastMsg) // copy only if a message was actually received
       {
         *curr_num_el = lastMsg->num_elem;
-        memcpy(id+i*n_el, lastMsg->id.data(),std::min(n_el,lastMsg->id.size())*sizeof(int));
+        memset(id+i*n_el, 0, n_el*sizeof(uint32_t));
+        memcpy(id+i*n_el, lastMsg->id.data(),std::min(n_el,lastMsg->id.size())*sizeof(uint32_t));
         memcpy(xg+i*n_el, lastMsg->xg.data(),std::min(n_el,lastMsg->xg.size())*sizeof(double));
         memcpy(yg+i*n_el, lastMsg->yg.data(),std::min(n_el,lastMsg->yg.size())*sizeof(double));
         memcpy(a+i*n_el, lastMsg->a.data(),std::min(n_el,lastMsg->a.size())*sizeof(double));
@@ -370,8 +371,8 @@ static void mdlOutputs(SimStruct *S, int_T tid)
         memcpy(n02+i*n_el, lastMsg->n02.data(),std::min(n_el,lastMsg->n02.size())*sizeof(double));
         memcpy(n20+i*n_el, lastMsg->n20.data(),std::min(n_el,lastMsg->n20.size())*sizeof(double));
 
-        for (size_t k = std::min(n_el,lastMsg->id.size()); k<n_el; ++k)
-          id[i*n_el+k] = (uint32_t)NAN;
+        for (size_t k = 0; k < std::min(n_el,lastMsg->id.size()); ++k)
+          id[i*n_el+k] ++; //increase existing id by 1 (0-based to 1-based). 0 means no-id.
         for (size_t k = std::min(n_el,lastMsg->xg.size()); k<n_el; ++k)
           xg[i*n_el+k] = NAN;
         for (size_t k = std::min(n_el,lastMsg->yg.size()); k<n_el; ++k)
